@@ -8,6 +8,17 @@ internal sealed class Try<T> {
             Error(exc)
         }
     }
+
+    @Suppress("IMPLICIT_CAST_TO_ANY")
+    override fun toString(): String = when (this) {
+        is Success -> value
+        is Error -> error
+    }.toString()
+}
+
+internal fun <T> Try<T>.orElseGet(default: T): T = when (this) {
+    is Success -> value
+    is Error -> default
 }
 
 internal class Success<T>(val value: T) : Try<T>()
