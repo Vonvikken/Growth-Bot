@@ -26,7 +26,7 @@ class GrowthBotMain : CliktCommand() {
 
     override fun run() {
         val config = Config.fromFile(Paths.get(configPath))
-        val bot = GrowthBot(config) // TODO add other commands
+        val bot = GrowthBot(config = config, NewBaby, SwitchBaby, DeleteBaby, Weight, Length)
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {

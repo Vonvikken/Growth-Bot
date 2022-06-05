@@ -10,14 +10,13 @@ import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
 import com.github.kotlintelegrambot.network.fold
 
-private typealias OptionalCallback = (() -> Unit)?
-
-internal class GrowthBot(config: Config, vararg commands: Pair<Command, () -> Unit>) {
+internal class GrowthBot(config: Config, vararg commands: Command) {
 
     private val log by logger {}
     private val bot: Bot
     private val chatID: Long = config.chatID
     private val botToken: String = config.token
+
     val chatIDHash: String = HashCalc.sha3256(chatID)
 
     init {
@@ -25,22 +24,10 @@ internal class GrowthBot(config: Config, vararg commands: Pair<Command, () -> Un
             token = botToken
             logLevel = LogLevel.Error
             dispatch {
-                commands.forEach { installCommand(it.first, it.second) }
-
-                installCommand(Command.HELP) {
-                    sendMessage(
-                        BotMessage.createMessage(BotMessage.Type.HELP) {
-                            return@createMessage StringBuilder().apply {
-                                Command.values().forEach { cmd ->
-                                    append("\u2022 /${cmd.commandName} ")
-                                    appendLine("\u2192 ${cmd.description}")
-                                }
-                            }.toString()
-                        }
-                    )
-                }
+                commands.forEach { installCommand(it) }
+                installHelpCommand(commands.map { it.commandName to it.description }.toList())
             }
-        }.apply { startPolling() }
+        }.apply(Bot::startPolling)
 
         sendApplicationMessage {
             val check = "white_check_mark".emoji()
@@ -64,9 +51,24 @@ internal class GrowthBot(config: Config, vararg commands: Pair<Command, () -> Un
         result.fold({}, { log.error("Error! ${it.errorBody}") })
     }
 
-    private fun Dispatcher.installCommand(command: Command, block: OptionalCallback) {
-        command(command.commandName) {
-            block?.takeIf { checkMessageChatId(update.message) }?.invoke()
+    private fun Dispatcher.installHelpCommand(cmds: List<Pair<String, String>>) {
+        command("help") {
+            if (checkMessageChatId(update.message)) {
+                sendMessage(
+                    BotMessage.createMessage(BotMessage.Type.HELP) {
+                        return@createMessage StringBuilder().apply {
+                            appendLine("\u2022 /help \u2192 Print a list of the available commands.")
+                            cmds.forEach { cmd -> appendLine("\u2022 /${cmd.first} \u2192 ${cmd.second}") }
+                        }.toString()
+                    }
+                )
+            }
+        }
+    }
+
+    private fun Dispatcher.installCommand(cmd: Command) {
+        command(cmd.commandName) {
+            cmd.callback.takeIf { checkMessageChatId(update.message) }?.invoke()
         }
     }
 
