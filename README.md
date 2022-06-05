@@ -10,14 +10,14 @@
 
 Telegram Bot for recording child growth.
 
-# Description
+## Description
 
 I created this bot to monitor the growth of a baby by periodically entering the values of his/her weight and length.
 Data about the percentile values are then displayed.
 
 _More functionalities will come._
 
-# Disclaimer
+## Disclaimer
 
 The displayed results are for information use only, and _cannot replace in any case_ those collected by a medic. Use
 this software at your own risk!
