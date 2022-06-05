@@ -18,6 +18,7 @@ internal class GrowthBot(config: Config, vararg commands: Pair<Command, () -> Un
     private val bot: Bot
     private val chatID: Long = config.chatID
     private val botToken: String = config.token
+    val chatIDHash: String = HashCalc.sha3256(chatID)
 
     init {
         bot = bot {
