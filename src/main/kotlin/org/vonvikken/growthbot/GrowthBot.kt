@@ -51,6 +51,12 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
         result.fold({}, { log.error("Error! ${it.errorBody}") })
     }
 
+    internal fun sendStopMessage() {
+        sendApplicationMessage {
+            "${"stop_sign".emoji()} ${"Bot stopped!".italic().bold()} ${"hand".emoji()}"
+        }
+    }
+
     private fun Dispatcher.installHelpCommand(cmds: List<Pair<String, String>>) {
         command("help") {
             if (checkMessageChatId(update.message)) {

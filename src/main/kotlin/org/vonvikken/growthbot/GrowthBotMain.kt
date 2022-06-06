@@ -30,9 +30,7 @@ class GrowthBotMain : CliktCommand() {
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
-                bot.sendApplicationMessage {
-                    "${"stop_sign".emoji()} ${"Bot stopped!".italic().bold()} ${"hand".emoji()}"
-                }
+                bot.sendStopMessage()
                 log.info("Growth bot stopped.")
             }
         })
