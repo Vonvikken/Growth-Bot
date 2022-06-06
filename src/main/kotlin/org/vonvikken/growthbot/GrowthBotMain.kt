@@ -27,16 +27,16 @@ class GrowthBotMain : CliktCommand() {
     private val configPath by option(
         "-c",
         "--config",
-        help = "path to the config file (default: \"./config.json\")"
+        help = "path to the config file (default: \"./$CONFIG_DEFAULT_PATH\")"
     ).default(CONFIG_DEFAULT_PATH)
 
     override fun run() {
         val config = Config.fromFile(Paths.get(configPath))
-        val bot = GrowthBot(config = config, NewBaby, SwitchBaby, DeleteBaby, Weight, Length)
+        val growthBot = GrowthBot(config = config, NewBaby, SwitchBaby, DeleteBaby, Weight, Length)
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
-                bot.sendStopMessage()
+                growthBot.sendStopMessage()
                 log.info("Growth bot stopped.")
             }
         })

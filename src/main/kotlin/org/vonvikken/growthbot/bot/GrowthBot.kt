@@ -5,10 +5,10 @@ import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.Dispatcher
 import com.github.kotlintelegrambot.dispatcher.command
+import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.Message
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
-import com.github.kotlintelegrambot.network.fold
 import org.vonvikken.growthbot.Config
 import org.vonvikken.growthbot.HashCalc
 import org.vonvikken.growthbot.bold
@@ -19,11 +19,12 @@ import org.vonvikken.growthbot.logger
 internal class GrowthBot(config: Config, vararg commands: Command) {
 
     private val log by logger {}
-    private val bot: Bot
-    private val chatID: Long = config.chatID
+    private val chatID: ChatId.Id = ChatId.Id(config.chatID)
     private val botToken: String = config.token
 
-    val chatIDHash: String = HashCalc.sha3256(chatID)
+    val bot: Bot
+    val chatIDHash: String = HashCalc.sha3256(config.chatID)
+    var currentBabyID: Int = -1
 
     init {
         bot = bot {
@@ -54,7 +55,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
     private fun sendMessage(message: BotMessage) {
         val result = bot.sendMessage(chatID, message.text, ParseMode.HTML)
         log.debug("Sent message: ${message.text}")
-        result.fold({}, { log.error("Error! ${it.errorBody}") })
+        result.fold({}, { log.error("Error! $it") })
     }
 
     internal fun sendStopMessage() {
@@ -89,9 +90,8 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
 
         val username = message.from?.username ?: "[Unknown username]"
         val text = message.text ?: "[No text]"
-        val chatId = message.chat.id
 
-        val isOk = chatID == chatId
+        val isOk = chatID.id == message.chat.id
 
         if (isOk) {
             log.debug("Message received from user $username:\n\t$text")

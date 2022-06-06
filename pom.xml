@@ -31,7 +31,7 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.serialization.version>1.3.3</kotlin.serialization.version>
         <kotlinx.serialization.csv.version>2.0.0</kotlinx.serialization.csv.version>
-        <kotlin.telegram.bot.version>6.0.1</kotlin.telegram.bot.version>
+        <kotlin.telegram.bot.version>6.0.7</kotlin.telegram.bot.version>
         <exposed.version>0.38.2</exposed.version>
         <sqlite.jdbc.version>3.36.0.3</sqlite.jdbc.version>
         <clikt.version>3.4.2</clikt.version>
