@@ -7,6 +7,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.vonvikken.growthbot.bot.DeleteBaby
+import org.vonvikken.growthbot.bot.GrowthBot
+import org.vonvikken.growthbot.bot.Length
+import org.vonvikken.growthbot.bot.NewBaby
+import org.vonvikken.growthbot.bot.SwitchBaby
+import org.vonvikken.growthbot.bot.Weight
 import java.nio.file.Path
 import java.nio.file.Paths
 

@@ -1,4 +1,4 @@
-package org.vonvikken.growthbot
+package org.vonvikken.growthbot.bot
 
 internal typealias CommandCallback = () -> Unit
 

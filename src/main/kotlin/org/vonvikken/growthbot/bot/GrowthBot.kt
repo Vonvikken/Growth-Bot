@@ -1,4 +1,4 @@
-package org.vonvikken.growthbot
+package org.vonvikken.growthbot.bot
 
 import com.github.kotlintelegrambot.Bot
 import com.github.kotlintelegrambot.bot
@@ -9,6 +9,12 @@ import com.github.kotlintelegrambot.entities.Message
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.github.kotlintelegrambot.logging.LogLevel
 import com.github.kotlintelegrambot.network.fold
+import org.vonvikken.growthbot.Config
+import org.vonvikken.growthbot.HashCalc
+import org.vonvikken.growthbot.bold
+import org.vonvikken.growthbot.emoji
+import org.vonvikken.growthbot.italic
+import org.vonvikken.growthbot.logger
 
 internal class GrowthBot(config: Config, vararg commands: Command) {
 

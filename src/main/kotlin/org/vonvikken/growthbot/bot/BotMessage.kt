@@ -1,4 +1,7 @@
-package org.vonvikken.growthbot
+package org.vonvikken.growthbot.bot
+
+import org.vonvikken.growthbot.bold
+import org.vonvikken.growthbot.emoji
 
 internal class BotMessage private constructor(title: String, textBlock: () -> String, emoji: String? = null) {
 
