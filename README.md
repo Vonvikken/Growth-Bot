@@ -26,4 +26,4 @@ The growth data are stored on a file in the same machine the bot is running on. 
 parties.
 
 Percentile tables are taken from the [WHO site](https://www.who.int/tools/child-growth-standards/standards). All rights
-reserved.
+belong to their respective owners.
