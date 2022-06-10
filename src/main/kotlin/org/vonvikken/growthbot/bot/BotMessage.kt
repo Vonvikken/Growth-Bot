@@ -6,13 +6,15 @@ import org.vonvikken.growthbot.emoji
 internal class BotMessage private constructor(title: String, textBlock: () -> String, emoji: String? = null) {
 
     enum class Type(val title: String, val emoji: String? = null) {
-        APPLICATION("Growth Bot", "bell"),
+        APPLICATION("Growth Bot", "baby_bottle"),
+        ERROR("Error", "exclamation"),
         SERVICE("Service message", "gear"),
-        NOTIFICATION("Notification received", "incoming_envelope"),
-        HELP("Available commands", "information_source")
+        INFO("Information", "information_source"),
+        HELP("Available commands", "question")
     }
 
     companion object {
+
         internal fun createMessage(messageType: Type, textBlock: () -> String): BotMessage =
             BotMessage(messageType.title, textBlock, messageType.emoji)
     }

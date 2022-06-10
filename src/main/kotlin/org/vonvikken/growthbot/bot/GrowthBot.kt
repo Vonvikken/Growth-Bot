@@ -22,7 +22,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
     private val chatID: ChatId.Id = ChatId.Id(config.chatID)
     private val botToken: String = config.token
 
-    val bot: Bot
+    private val bot: Bot
     val chatIDHash: String = HashCalc.sha3256(config.chatID)
     var currentBabyID: Int = -1
 
@@ -36,7 +36,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
             }
         }.apply(Bot::startPolling)
 
-        sendApplicationMessage {
+        sendServiceMessage {
             val check = "white_check_mark".emoji()
             val rocket = "rocket".emoji()
 
@@ -48,9 +48,17 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
         log.info("Growth bot started.")
     }
 
-    internal fun sendApplicationMessage(textBlock: () -> String) {
-        sendMessage(BotMessage.createMessage(BotMessage.Type.APPLICATION, textBlock))
-    }
+    internal fun sendApplicationMessage(textBlock: () -> String) =
+        sendTypedMessage(BotMessage.Type.APPLICATION, textBlock)
+
+    internal fun sendErrorMessage(textBlock: () -> String) = sendTypedMessage(BotMessage.Type.ERROR, textBlock)
+
+    internal fun sendInfoMessage(textBlock: () -> String) = sendTypedMessage(BotMessage.Type.INFO, textBlock)
+
+    private fun sendServiceMessage(textBlock: () -> String) = sendTypedMessage(BotMessage.Type.SERVICE, textBlock)
+
+    private fun sendTypedMessage(type: BotMessage.Type, textBlock: () -> String) =
+        sendMessage(BotMessage.createMessage(type, textBlock))
 
     private fun sendMessage(message: BotMessage) {
         val result = bot.sendMessage(chatID, message.text, ParseMode.HTML)
@@ -59,7 +67,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
     }
 
     internal fun sendStopMessage() {
-        sendApplicationMessage {
+        sendServiceMessage {
             "${"stop_sign".emoji()} ${"Bot stopped!".italic().bold()} ${"hand".emoji()}"
         }
     }
@@ -81,7 +89,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
 
     private fun Dispatcher.installCommand(cmd: Command) {
         command(cmd.commandName) {
-            cmd.callback.takeIf { checkMessageChatId(update.message) }?.invoke()
+            cmd.callback.takeIf { checkMessageChatId(update.message!!) }?.invoke(this@GrowthBot, args)
         }
     }
 

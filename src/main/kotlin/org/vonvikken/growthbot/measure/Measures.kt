@@ -18,7 +18,7 @@ internal object GrowthTables {
 
 @OptIn(ExperimentalSerializationApi::class)
 internal class GrowthTable private constructor(list: List<MeasureEntry>) {
-    private val data: Map<Int, MeasureRange> = list.associateBy({ it.day }, ::MeasureRange)
+    private val data: Map<Int, MeasureRange> = list.associateBy(MeasureEntry::day, ::MeasureRange)
 
     companion object {
         fun loadDataset(datasetName: DatasetName): GrowthTable {
