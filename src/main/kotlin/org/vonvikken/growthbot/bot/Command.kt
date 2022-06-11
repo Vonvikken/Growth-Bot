@@ -1,6 +1,7 @@
 package org.vonvikken.growthbot.bot
 
 import org.vonvikken.growthbot.Try
+import org.vonvikken.growthbot.db.Gender
 import org.vonvikken.growthbot.manage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -27,9 +28,16 @@ internal object NewBaby : Command(
     { bot, args ->
         checkEmptyArguments(
             args,
-            { bot.sendInfoMessage { "${args.joinToString(separator = " ")} added!" } },
-            { bot.sendErrorMessage { "Specify at least name and gender as argument." } }
-        )
+            {
+                // TODO check correct command syntax
+                val name = args[0]
+                val gender = if (args[1] == "m") Gender.MALE else Gender.FEMALE
+                val birthDate = args.elementAtOrNull(2)?.toDate() ?: LocalDate.now()
+                bot.addBaby(name, gender, birthDate)
+            }
+        ) {
+            bot.sendErrorMessage { "Wrong parameters! See help for the correct syntax!" }
+        }
     }
 )
 

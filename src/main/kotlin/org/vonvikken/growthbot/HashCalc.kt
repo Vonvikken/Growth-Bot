@@ -7,6 +7,6 @@ internal object HashCalc {
 
     fun sha3256(value: Long): String {
         val hash: ByteArray = dig.digest(value.toString().toByteArray())
-        return hash.joinToString { "%02x".format(it) }
+        return hash.joinToString(separator = "") { "%02x".format(it) }
     }
 }
