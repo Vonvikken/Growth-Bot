@@ -30,3 +30,12 @@ internal fun GrowthBot.switchBaby(name: String) {
         log.error(it.error.message)
     })
 }
+
+internal fun GrowthBot.deleteBaby(name: String) {
+    DataOperations.deleteBaby(name).manage({
+        if (it > 0) sendInfoMessage { "${name.bold()} removed!" } else sendInfoMessage { "${name.italic()} not found!" }
+    }, {
+        sendErrorMessage { "Error! Cannot remove ${name.italic()}!" }
+        log.error(it.error.message)
+    })
+}

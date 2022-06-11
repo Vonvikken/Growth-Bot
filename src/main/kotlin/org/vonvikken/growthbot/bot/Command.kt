@@ -46,9 +46,7 @@ internal object SwitchBaby : Command(
     { bot, args ->
         checkEmptyArguments(
             args,
-            {
-                bot.switchBaby(args[0])
-            },
+            { bot.switchBaby(args[0]) },
             { bot.sendErrorMessage { "Specify a name as argument." } },
         )
     }
@@ -62,7 +60,7 @@ internal object DeleteBaby : Command(
     { bot, args ->
         checkEmptyArguments(
             args,
-            { bot.sendInfoMessage { "${args.joinToString(separator = " ")} deleted!" } },
+            { bot.deleteBaby(args[0]) },
             { bot.sendErrorMessage { "Specify a name as argument." } },
         )
     }

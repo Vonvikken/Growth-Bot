@@ -1,6 +1,7 @@
 package org.vonvikken.growthbot.db
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -28,6 +29,12 @@ internal object DataOperations {
         transaction {
             return@transaction Baby.slice(Baby.id).select { Baby.name eq name }.firstOrNull()?.get(Baby.id)?.value
                 ?: throw IllegalArgumentException("$name not found!")
+        }
+    }
+
+    fun deleteBaby(name: String): Try<Int> = Try {
+        transaction {
+            return@transaction Baby.deleteWhere { Baby.name eq name }
         }
     }
 }
