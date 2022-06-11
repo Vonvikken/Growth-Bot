@@ -11,11 +11,22 @@ import java.time.LocalDate
 private val log by logger { }
 
 internal fun GrowthBot.addBaby(name: String, gender: Gender, birthDate: LocalDate) {
-    DataOperations.addBaby(name, gender, birthDate, chatIDHash).manage({ entityID ->
-        currentBabyID = entityID.value
+    DataOperations.addBaby(name, gender, birthDate, chatIDHash).manage({ babyID ->
+        currentBabyID = babyID.value
         sendInfoMessage { "${name.bold()} added!" }
     }, {
         sendErrorMessage { "Error! Cannot add ${name.italic()}!" }
+        log.error(it.error.message)
+    })
+}
+
+internal fun GrowthBot.switchBaby(name: String) {
+    DataOperations.switchToBaby(name).manage({ babyID ->
+        currentBabyID = babyID
+        sendInfoMessage { "Current baby is ${name.bold()}!" }
+        log.info("Current Baby ID: $currentBabyID")
+    }, {
+        sendErrorMessage { "Error! Cannot switch to ${name.italic()}!" }
         log.error(it.error.message)
     })
 }

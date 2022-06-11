@@ -26,16 +26,13 @@ internal object NewBaby : Command(
         |If the date of birth is not specified, the default is the current day.
     """.trimMargin(),
     { bot, args ->
-        checkEmptyArguments(
-            args,
-            {
-                // TODO check correct command syntax
-                val name = args[0]
-                val gender = if (args[1] == "m") Gender.MALE else Gender.FEMALE
-                val birthDate = args.elementAtOrNull(2)?.toDate() ?: LocalDate.now()
-                bot.addBaby(name, gender, birthDate)
-            }
-        ) {
+        checkEmptyArguments(args, {
+            // TODO check correct command syntax
+            val name = args[0]
+            val gender = if (args[1] == "m") Gender.MALE else Gender.FEMALE
+            val birthDate = args.elementAtOrNull(2)?.toDate() ?: LocalDate.now()
+            bot.addBaby(name, gender, birthDate)
+        }) {
             bot.sendErrorMessage { "Wrong parameters! See help for the correct syntax!" }
         }
     }
@@ -49,7 +46,9 @@ internal object SwitchBaby : Command(
     { bot, args ->
         checkEmptyArguments(
             args,
-            { bot.sendInfoMessage { "Switched to ${args.joinToString(separator = " ")}!" } },
+            {
+                bot.switchBaby(args[0])
+            },
             { bot.sendErrorMessage { "Specify a name as argument." } },
         )
     }
