@@ -10,7 +10,7 @@ internal class BotMessage private constructor(title: String, textBlock: () -> St
         ERROR("Error", "exclamation"),
         SERVICE("Service message", "gear"),
         INFO("Information", "information_source"),
-        HELP("Available commands", "question")
+        HELP("Help", "question")
     }
 
     companion object {

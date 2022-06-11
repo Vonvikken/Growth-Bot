@@ -86,11 +86,13 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
     private fun Dispatcher.installHelpForCommands(commands: List<Command>) {
         command("help") {
             update.message.ifAuthorized {
-                sendMessage(
-                    BotMessage.createMessage(BotMessage.Type.HELP) {
-                        genericHelp(commands)
-                    }
-                )
+                if (args.isEmpty()) {
+                    genericHelp(commands)
+                } else {
+                    commands.firstOrNull { it.commandName == args[0] }?.help()
+                }?.let {
+                    sendMessage(BotMessage.createMessage(BotMessage.Type.HELP) { it })
+                }
             }
         }
     }
@@ -98,6 +100,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
     private fun genericHelp(commands: List<Command>): String {
         val helpParam = "command-name".monospace()
         return StringBuilder().apply {
+            appendLine("Available commands".bold())
             appendLine("\u2022 /help \u2192 Print a list of the available commands.")
             appendLine("\u2022 /help $helpParam \u2192 Print a detailed help of $helpParam.")
             commands.forEach {
@@ -105,5 +108,14 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
                 appendLine("\u2022 /$cmdLine \u2192 ${it.description}")
             }
         }.toString()
+    }
+
+    private fun Command.help(): String {
+        return """Help for command ${commandName.bold()}
+            |
+            |Parameters: ${params.monospace()}
+            |
+            |$longDescription
+        """.trimMargin()
     }
 }
