@@ -15,6 +15,7 @@ import org.vonvikken.growthbot.bold
 import org.vonvikken.growthbot.emoji
 import org.vonvikken.growthbot.italic
 import org.vonvikken.growthbot.logger
+import org.vonvikken.growthbot.monospace
 
 internal class GrowthBot(config: Config, vararg commands: Command) {
 
@@ -32,7 +33,7 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
             logLevel = LogLevel.Error
             dispatch {
                 commands.forEach { installCommand(it) }
-                installHelpCommand(commands.map { it.commandName to it.description }.toList())
+                installHelpForCommands(commands.asList())
             }
         }.apply(Bot::startPolling)
 
@@ -72,41 +73,37 @@ internal class GrowthBot(config: Config, vararg commands: Command) {
         }
     }
 
-    private fun Dispatcher.installHelpCommand(cmds: List<Pair<String, String>>) {
+    private fun Message?.ifAuthorized(block: () -> Unit) {
+        if (this?.chat?.id == chatID.id) block()
+    }
+
+    private fun Dispatcher.installCommand(cmd: Command) {
+        command(cmd.commandName) {
+            update.message.ifAuthorized { cmd.callback(this@GrowthBot, args) }
+        }
+    }
+
+    private fun Dispatcher.installHelpForCommands(commands: List<Command>) {
         command("help") {
-            if (checkMessageChatId(update.message)) {
+            update.message.ifAuthorized {
                 sendMessage(
                     BotMessage.createMessage(BotMessage.Type.HELP) {
-                        return@createMessage StringBuilder().apply {
-                            appendLine("\u2022 /help \u2192 Print a list of the available commands.")
-                            cmds.forEach { cmd -> appendLine("\u2022 /${cmd.first} \u2192 ${cmd.second}") }
-                        }.toString()
+                        genericHelp(commands)
                     }
                 )
             }
         }
     }
 
-    private fun Dispatcher.installCommand(cmd: Command) {
-        command(cmd.commandName) {
-            cmd.callback.takeIf { checkMessageChatId(update.message!!) }?.invoke(this@GrowthBot, args)
-        }
-    }
-
-    private fun checkMessageChatId(message: Message?): Boolean {
-        if (message == null) return false
-
-        val username = message.from?.username ?: "[Unknown username]"
-        val text = message.text ?: "[No text]"
-
-        val isOk = chatID.id == message.chat.id
-
-        if (isOk) {
-            log.debug("Message received from user $username:\n\t$text")
-        } else {
-            log.warn("Message received from unauthorized user $username:\n\t$text")
-        }
-
-        return isOk
+    private fun genericHelp(commands: List<Command>): String {
+        val helpParam = "command-name".monospace()
+        return StringBuilder().apply {
+            appendLine("\u2022 /help \u2192 Print a list of the available commands.")
+            appendLine("\u2022 /help $helpParam \u2192 Print a detailed help of $helpParam.")
+            commands.forEach {
+                val cmdLine = listOf(it.commandName, it.params.monospace()).joinToString(" ")
+                appendLine("\u2022 /$cmdLine \u2192 ${it.description}")
+            }
+        }.toString()
     }
 }

@@ -9,9 +9,14 @@ private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
 internal typealias CommandCallback = (bot: GrowthBot, args: List<String>) -> Unit
 
-internal sealed class Command(val commandName: String, val description: String, val callback: CommandCallback)
+internal sealed class Command(
+    val commandName: String,
+    val description: String,
+    val params: String = "",
+    val callback: CommandCallback
+)
 
-internal object NewBaby : Command("new", "Add a new baby.", { bot, args ->
+internal object NewBaby : Command("new", "Add a new baby.", "baby-name", { bot, args ->
     checkEmptyArguments(
         args,
         { bot.sendInfoMessage { "${args.joinToString(separator = " ")} added!" } },
@@ -19,7 +24,7 @@ internal object NewBaby : Command("new", "Add a new baby.", { bot, args ->
     )
 })
 
-internal object SwitchBaby : Command("switch", "Switch to another existing baby.", { bot, args ->
+internal object SwitchBaby : Command("switch", "Switch to another existing baby.", "baby-name", { bot, args ->
     checkEmptyArguments(
         args,
         { bot.sendInfoMessage { "Switched to ${args.joinToString(separator = " ")}!" } },
@@ -27,7 +32,7 @@ internal object SwitchBaby : Command("switch", "Switch to another existing baby.
     )
 })
 
-internal object DeleteBaby : Command("delete", "Delete an existing baby.", { bot, args ->
+internal object DeleteBaby : Command("delete", "Delete an existing baby.", "baby-name", { bot, args ->
     checkEmptyArguments(
         args,
         { bot.sendInfoMessage { "${args.joinToString(separator = " ")} deleted!" } },
@@ -35,7 +40,7 @@ internal object DeleteBaby : Command("delete", "Delete an existing baby.", { bot
     )
 })
 
-internal object Weight : Command("weight", "Add a weight measurement.", { bot, args ->
+internal object Weight : Command("weight", "Add a weight measurement.", "weight [date]", { bot, args ->
     checkEmptyArguments(args, {
         Try {
             val weight = args[0].toInt()
@@ -49,7 +54,7 @@ internal object Weight : Command("weight", "Add a weight measurement.", { bot, a
     }, { bot.sendErrorMessage { "Insert at least the weight measurement in grams." } })
 })
 
-internal object Length : Command("length", "Add a length measurement.", { bot, args ->
+internal object Length : Command("length", "Add a length measurement.", "length [date]", { bot, args ->
     checkEmptyArguments(args, {
         Try {
             val weight = args[0].toInt()
