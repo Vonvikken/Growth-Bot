@@ -2,10 +2,16 @@ package org.vonvikken.growthbot.db
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.vonvikken.growthbot.Try
+import org.vonvikken.growthbot.measure.DatasetName
+import org.vonvikken.growthbot.measure.GrowthTables
+import org.vonvikken.growthbot.measure.MeasureRange
+import org.vonvikken.growthbot.measure.elapsedDays
+import org.vonvikken.growthbot.successOrNull
 import java.time.LocalDate
 
 internal object DataOperations {
@@ -36,5 +42,56 @@ internal object DataOperations {
         transaction {
             return@transaction Baby.deleteWhere { Baby.name eq name }
         }
+    }
+
+    fun addWeight(babyId: Int, value: Int, date: LocalDate): Try<MeasureRange.Percentile> =
+        addMeasure(Weight, babyId, value, date, { it / 1000.0 }) {
+            when (it) {
+                Gender.MALE -> DatasetName.WEIGHT_MALE
+                Gender.FEMALE -> DatasetName.WEIGHT_FEMALE
+            }
+        }
+
+    fun addLength(babyId: Int, value: Int, date: LocalDate): Try<MeasureRange.Percentile> =
+        addMeasure(Length, babyId, value, date, Int::toDouble) {
+            when (it) {
+                Gender.MALE -> DatasetName.LENGTH_MALE
+                Gender.FEMALE -> DatasetName.LENGTH_FEMALE
+            }
+        }
+
+    private fun addMeasure(
+        quantity: Measure,
+        babyId: Int,
+        value: Int,
+        date: LocalDate,
+        valueConversion: (Int) -> Double,
+        datasetSelector: (Gender) -> DatasetName,
+    ) = Try {
+        transaction {
+            val baby = Baby.slice(Baby.gender, Baby.birthDate).select { Baby.id eq babyId }.firstOrNull()
+                ?: throw IllegalArgumentException("Baby with ID $babyId not found!")
+            val datasetName = datasetSelector(baby[Baby.gender])
+            val day = baby[Baby.birthDate].elapsedDays(date)
+            val percentile = GrowthTables.getMeasurePercentile(datasetName, day, valueConversion(value)).successOrNull()
+                ?: throw IllegalArgumentException("Wrong measure: $value!")
+            insertMeasure(quantity, babyId, value, date, percentile)
+            return@transaction percentile
+        }
+    }
+
+    private inline fun <reified T : Measure> insertMeasure(
+        quantity: T,
+        babyId: Int,
+        value: Int,
+        date: LocalDate,
+        percentile: MeasureRange.Percentile
+    ): Int {
+        return quantity.insert {
+            it[quantity.babyID] = babyId
+            it[quantity.measure] = value
+            it[quantity.date] = date
+            it[quantity.percentile] = percentile
+        }.insertedCount
     }
 }

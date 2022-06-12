@@ -1,6 +1,7 @@
 package org.vonvikken.growthbot.measure
 
 internal class MeasureRange(entry: MeasureEntry) {
+
     val day = entry.day
     private val ranges: Map<DoubleRange, Percentile>
 
@@ -31,8 +32,23 @@ internal class MeasureRange(entry: MeasureEntry) {
         return ranges[range]!!
     }
 
-    enum class Percentile {
-        UNDER, P_01, P_1, P_3, P_5, P_10, P_15, P_25, P_50, P_75, P_85, P_90, P_95, P_97, P_99, P_999
+    enum class Percentile(val label: String) {
+        UNDER("<0.1%"),
+        P_01("0.1%"),
+        P_1("1%"),
+        P_3("3%"),
+        P_5("5%"),
+        P_10("10%"),
+        P_15("15%"),
+        P_25("25%"),
+        P_50("50%"),
+        P_75("75%"),
+        P_85("85%"),
+        P_90("90%"),
+        P_95("95%"),
+        P_97("97%"),
+        P_99("97%"),
+        P_999(">=99.9%")
     }
 }
 

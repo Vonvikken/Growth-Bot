@@ -39,3 +39,29 @@ internal fun GrowthBot.deleteBaby(name: String) {
         log.error(it.error.message)
     })
 }
+
+internal fun GrowthBot.addWeight(value: Int, date: LocalDate) {
+    DataOperations.addWeight(currentBabyID, value, date).manage({
+        sendInfoMessage(
+            """Weight added!
+                        |Percentile: ${it.label.bold()}
+            """::trimMargin
+        )
+    }, {
+        sendErrorMessage { "Error! Cannot add weight!" }
+        log.error(it.error.message)
+    })
+}
+
+internal fun GrowthBot.addLength(value: Int, date: LocalDate) {
+    DataOperations.addLength(currentBabyID, value, date).manage({
+        sendInfoMessage(
+            """Length added!
+                        |Percentile: ${it.label.bold()}
+            """::trimMargin
+        )
+    }, {
+        sendErrorMessage { "Error! Cannot add length!" }
+        log.error(it.error.message)
+    })
+}

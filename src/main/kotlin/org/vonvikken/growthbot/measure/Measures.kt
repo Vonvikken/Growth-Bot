@@ -5,6 +5,8 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.csv.Csv
 import org.vonvikken.growthbot.Try
 import java.io.File
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @OptIn(ExperimentalSerializationApi::class)
 internal object GrowthTables {
@@ -36,3 +38,5 @@ internal class GrowthTable private constructor(list: List<MeasureEntry>) {
     fun getPercentile(day: Int, measure: Double): MeasureRange.Percentile =
         data[day]?.getPercentile(measure) ?: throw IllegalArgumentException("Day $day not found!")
 }
+
+internal fun LocalDate.elapsedDays(today: LocalDate): Int = ChronoUnit.DAYS.between(this, today).toInt() + 1

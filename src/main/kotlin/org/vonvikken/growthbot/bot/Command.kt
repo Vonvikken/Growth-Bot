@@ -1,8 +1,6 @@
 package org.vonvikken.growthbot.bot
 
-import org.vonvikken.growthbot.Try
 import org.vonvikken.growthbot.db.Gender
-import org.vonvikken.growthbot.manage
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -75,15 +73,9 @@ internal object Weight : Command(
     """.trimMargin(),
     { bot, args ->
         checkEmptyArguments(args, {
-            Try {
-                val weight = args[0].toInt()
-                val date = args.elementAtOrNull(1)?.toDate() ?: LocalDate.now()
-                "Weight: $weight g Date: ${date.toDateString()}"
-            }.manage({
-                bot.sendApplicationMessage { it }
-            }, {
-                bot.sendErrorMessage { it.error.message!! }
-            })
+            val weight = args[0].toInt()
+            val date = args.elementAtOrNull(1)?.toDate() ?: LocalDate.now()
+            bot.addWeight(weight, date)
         }, { bot.sendErrorMessage { "Insert at least the weight measurement in grams." } })
     }
 )
@@ -97,19 +89,16 @@ internal object Length : Command(
     """.trimMargin(),
     { bot, args ->
         checkEmptyArguments(args, {
-            Try {
-                val weight = args[0].toInt()
-                val date = args.elementAtOrNull(1)?.toDate() ?: LocalDate.now()
-                "Weight: $weight cm Date: ${date.toDateString()}"
-            }.manage({
-                bot.sendApplicationMessage { it }
-            }, {
-                bot.sendErrorMessage { it.error.message!! }
-            })
+            val length = args[0].toInt()
+            val date = args.elementAtOrNull(1)?.toDate() ?: LocalDate.now()
+            bot.addLength(length, date)
         }, { bot.sendErrorMessage { "Insert at least the length measurement in centimeters." } })
     }
 )
 
+// TODO check also:
+// - Arguments number and format
+// - currentBabyId != -1
 private fun checkEmptyArguments(args: List<String>, ifOk: () -> Unit, ifError: () -> Unit) =
     if (args.isNotEmpty()) ifOk() else ifError()
 
