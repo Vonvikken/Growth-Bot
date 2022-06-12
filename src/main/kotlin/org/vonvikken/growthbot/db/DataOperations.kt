@@ -67,7 +67,7 @@ internal object DataOperations {
         date: LocalDate,
         valueConversion: (Int) -> Double,
         datasetSelector: (Gender) -> DatasetName,
-    ) = Try {
+    ): Try<MeasureRange.Percentile> = Try {
         transaction {
             val baby = Baby.slice(Baby.gender, Baby.birthDate).select { Baby.id eq babyId }.firstOrNull()
                 ?: throw IllegalArgumentException("Baby with ID $babyId not found!")
@@ -80,7 +80,7 @@ internal object DataOperations {
         }
     }
 
-    private inline fun <reified T : Measure> insertMeasure(
+    private fun <T : Measure> insertMeasure(
         quantity: T,
         babyId: Int,
         value: Int,
