@@ -9,6 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.vonvikken.growthbot.bot.DeleteBaby
 import org.vonvikken.growthbot.bot.GrowthBot
+import org.vonvikken.growthbot.bot.Info
 import org.vonvikken.growthbot.bot.Length
 import org.vonvikken.growthbot.bot.NewBaby
 import org.vonvikken.growthbot.bot.SwitchBaby
@@ -32,7 +33,7 @@ class GrowthBotMain : CliktCommand() {
 
     override fun run() {
         val config = Config.fromFile(Paths.get(configPath))
-        val growthBot = GrowthBot(config = config, NewBaby, SwitchBaby, DeleteBaby, Weight, Length)
+        val growthBot = GrowthBot(config = config, NewBaby, SwitchBaby, DeleteBaby, Weight, Length, Info)
 
         Runtime.getRuntime().addShutdownHook(object : Thread() {
             override fun run() {
@@ -48,7 +49,9 @@ internal data class Config(
     val token: String,
     @SerialName("chat_id") val chatID: Long,
 ) {
+
     companion object {
+
         internal fun fromFile(path: Path): Config = Json.decodeFromString(path.toFile().readText())
     }
 }

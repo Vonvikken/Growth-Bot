@@ -1,10 +1,8 @@
 package org.vonvikken.growthbot.bot
 
 import org.vonvikken.growthbot.db.Gender
+import org.vonvikken.growthbot.toDate
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
-private val DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
 internal typealias CommandCallback = (bot: GrowthBot, args: List<String>) -> Unit
 
@@ -96,13 +94,15 @@ internal object Length : Command(
     }
 )
 
+internal object Info : Command(
+    commandName = "info",
+    description = "Show info about the current baby",
+    longDescription = "Show info about the latest measurement of the current baby",
+    callback = { bot, _ -> bot.babyInfo() }
+)
+
 // TODO check also:
-// - Arguments number and format
-// - currentBabyId != -1
+//  - Arguments number and format
+//  - currentBabyId != -1
 private fun checkEmptyArguments(args: List<String>, ifOk: () -> Unit, ifError: () -> Unit) =
     if (args.isNotEmpty()) ifOk() else ifError()
-
-// TODO check format
-private fun String.toDate(): LocalDate = LocalDate.parse(this, DATE_FORMAT)
-
-private fun LocalDate.toDateString(): String = this.format(DATE_FORMAT)

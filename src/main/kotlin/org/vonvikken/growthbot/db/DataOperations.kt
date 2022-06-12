@@ -1,6 +1,7 @@
 package org.vonvikken.growthbot.db
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -94,4 +95,47 @@ internal object DataOperations {
             it[quantity.percentile] = percentile
         }.insertedCount
     }
+
+    fun info(babyId: Int) = Try {
+        transaction {
+            val query =
+                Baby.join(Weight, joinType = JoinType.LEFT, additionalConstraint = { Weight.babyID eq Baby.id })
+                    .join(Length, joinType = JoinType.LEFT, additionalConstraint = { Length.babyID eq Baby.id })
+                    .slice(
+                        Baby.name,
+                        Baby.birthDate,
+                        Baby.gender,
+                        Weight.measure,
+                        Weight.date,
+                        Weight.percentile,
+                        Length.measure,
+                        Length.date,
+                        Length.percentile
+                    ).select { Baby.id eq babyId }.firstOrNull()
+                    ?: throw IllegalArgumentException("Baby with ID $babyId not found!")
+            return@transaction InfoResult(
+                query[Baby.name],
+                query[Baby.birthDate],
+                query[Baby.gender],
+                query[Weight.measure],
+                query[Weight.date],
+                query[Weight.percentile],
+                query[Length.measure],
+                query[Length.date],
+                query[Length.percentile]
+            )
+        }
+    }
 }
+
+internal data class InfoResult(
+    val name: String,
+    val birthDate: LocalDate,
+    val gender: Gender,
+    val weight: Int?,
+    val weightDate: LocalDate?,
+    val weightPercentile: MeasureRange.Percentile?,
+    val length: Int?,
+    val lengthDate: LocalDate?,
+    val lengthPercentile: MeasureRange.Percentile?
+)

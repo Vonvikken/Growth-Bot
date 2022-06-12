@@ -48,7 +48,9 @@ internal class MeasureRange(entry: MeasureEntry) {
         P_95("95%"),
         P_97("97%"),
         P_99("97%"),
-        P_999(">=99.9%")
+        P_999(">=99.9%");
+
+        override fun toString(): String = label
     }
 }
 
