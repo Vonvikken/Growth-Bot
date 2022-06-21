@@ -73,7 +73,7 @@ internal object DataOperations {
             val baby = Baby.slice(Baby.gender, Baby.birthDate).select { Baby.id eq babyId }.firstOrNull()
                 ?: throw IllegalArgumentException("Baby with ID $babyId not found!")
             val datasetName = datasetSelector(baby[Baby.gender])
-            val day = baby[Baby.birthDate].elapsedDays(date)
+            val day = baby[Baby.birthDate].elapsedDays(date) - 1
             val percentile = GrowthTables.getMeasurePercentile(datasetName, day, valueConversion(value)).successOrNull()
                 ?: throw IllegalArgumentException("Wrong measure: $value!")
             insertMeasure(quantity, babyId, value, date, percentile)
