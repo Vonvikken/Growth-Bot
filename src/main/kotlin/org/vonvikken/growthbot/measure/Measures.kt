@@ -4,7 +4,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.csv.Csv
 import org.vonvikken.growthbot.Try
-import java.io.File
+import java.io.BufferedReader
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
@@ -24,10 +24,10 @@ internal class GrowthTable private constructor(list: List<MeasureEntry>) {
 
     companion object {
         fun loadDataset(datasetName: DatasetName): GrowthTable {
-            val list = this::class.java.getResource("/tables/${datasetName.fileName}.csv")?.let {
+            val list = this::class.java.getResourceAsStream("/tables/${datasetName.fileName}.csv")?.let {
                 return@let GrowthTables.csv.decodeFromString(
                     ListSerializer(MeasureEntry.serializer()),
-                    File(it.toURI()).readText()
+                    it.bufferedReader().use(BufferedReader::readText)
                 )
             } ?: emptyList()
 
