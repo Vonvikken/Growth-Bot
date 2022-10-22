@@ -111,7 +111,7 @@ internal object DataOperations {
                         Length.measure,
                         Length.date,
                         Length.percentile
-                    ).select { Baby.id eq babyId }.firstOrNull()
+                    ).select { Baby.id eq babyId }.lastOrNull()
                     ?: throw IllegalArgumentException("Baby with ID $babyId not found!")
             return@transaction InfoResult(
                 query[Baby.name],
